@@ -106,14 +106,19 @@ public class MainActivity extends AppCompatActivity {
 
         protected Event doInBackground(URL... urls) {
             // Create URL object
-            URL url = createUrl(USGS_REQUEST_URL);
+            URL url = null;
+            try {
+                url = createUrl(USGS_REQUEST_URL);
+            } catch (MalformedURLException e) {
+                Log.e(LOG_TAG, "URL no valida.", e);
+            }
 
             // Perform HTTP request to the URL and receive a JSON response back
             String jsonResponse = "";
             try {
                 jsonResponse = makeHttpRequest(url);
             } catch (IOException e) {
-                // TODO Handle the IOException
+                Log.e(LOG_TAG, "Problem making the HTTP request.", e);
             }
 
             // Extract relevant fields from the JSON response and create an {@link Event} object
@@ -139,7 +144,7 @@ public class MainActivity extends AppCompatActivity {
         /**
          * Returns new URL object from the given string URL.
          */
-        private URL createUrl(String stringUrl) {
+        private URL createUrl(String stringUrl) throws MalformedURLException{
             URL url = null;
             try {
                 url = new URL(stringUrl);
@@ -169,6 +174,8 @@ public class MainActivity extends AppCompatActivity {
                 if (urlConnection.getResponseCode() == 200) {
                     inputStream = urlConnection.getInputStream();
                     jsonResponse = readFromStream(inputStream);
+                }else {
+                    Log.e(LOG_TAG, "Error response code:" + urlConnection.getResponseCode());
                 }
             } catch (IOException e) {
                 // TODO: Handle the exception
